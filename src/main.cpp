@@ -17,25 +17,7 @@ pad_definition_t pad_list[] = {
 //#define PIN_STATUS_LED 8 // 2 is board led
 
 
-void setup()
-{   
-    Serial.begin(115200);
-    Serial.printf("Starting BLERetro32\n");
 
-    //pinMode(PIN_STATUS_LED, OUTPUT);
-
-    BLERetro32_Setup(pad_list, sizeof(pad_list) / sizeof(pad_definition_t));
-    Operate_Init();
-}
-
-void loop()
-{
-    auto cnn_status = BLERetro32_Loop();
-    //digitalWrite(PIN_STATUS_LED, GetLedStatus(cnn_status));
-    InterpretController();
-	Operate();
-
-}
 
 
 #define STATUS_LED_FAST_TIME 200
@@ -86,3 +68,24 @@ bool GetLedStatus(CnnStatus cnn_status)
 
 #define LOOP_DELAY 5
 
+void setup()
+{   
+    Serial.begin(115200);
+    Serial.printf("Starting BLERetro32\n");
+    
+    //pinMode(PIN_STATUS_LED, OUTPUT);
+
+    BLERetro32_Setup(pad_list, sizeof(pad_list) / sizeof(pad_definition_t)); 
+    Operate_Init();
+}
+
+void loop()
+{
+    auto cnn_status = BLERetro32_Loop();
+    
+    //digitalWrite(PIN_STATUS_LED, GetLedStatus(cnn_status));
+    InterpretController();
+	Operate();
+    //Serial.printf("Status:%d\n", cnn_status);
+
+}

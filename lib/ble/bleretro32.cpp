@@ -191,7 +191,7 @@ void CharacteristicNofifyCB(NimBLERemoteCharacteristic *characteristic, uint8_t 
 
 void ConnectToHID(NimBLEAdvertisedDevice *device)
 {
-    BLERETRO_LOGF("Connecting\n");
+    Serial.printf("Connecting\n");
     auto client = NimBLEDevice::createClient(foundDevice->getAddress());
     client->setClientCallbacks(new ClientCallbacks(), true);
     client->setConnectTimeout(5); // Por defecto son 30 segundos
