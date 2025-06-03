@@ -19,7 +19,11 @@ enum VehicleHead{
     ARMHEAD,
     BOARDHEAD
 };
-
+enum VehicleDirection{
+	Left,
+	Right,
+	None
+};
 #define Motor1_Dir_Pin1	7
 #define Motor1_Dir_Pin2 15    
 #define Motor2_Dir_Pin1 17
@@ -27,8 +31,8 @@ enum VehicleHead{
 
 //only temporary, need specification!!
 void Motor_Init(void);
-void Motor1_Operate(int32_t speed);
+void Motor1_Operate(VehicleDirection direction, int32_t speed);
 void Motor2_Operate(int32_t speed);
 
-void Vehicle_Move(enum VehicleMovement move,uint16_t speed);
+void Vehicle_Move(enum VehicleMovement move,uint16_t speed,uint16_t rotationspeed);
 #endif

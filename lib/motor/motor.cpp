@@ -10,25 +10,25 @@ void Motor_Init(void)
     pinMode(Motor2_Dir_Pin2, OUTPUT);
 }
 
-void Motor1_Operate(int32_t speed)
+void Motor1_Operate(VehicleDirection direction, int32_t rotationspeed)
 {
-    if (speed < -MOTORARR)
-        speed = -MOTORARR;
-    else if (speed > MOTORARR)
-        speed = MOTORARR;
+    if (rotationspeed < -MOTORARR)
+        rotationspeed = -MOTORARR;
+    else if (rotationspeed > MOTORARR)
+        rotationspeed = MOTORARR;
 
-    if (speed > 0)
+    if (direction == Left)
     {
         digitalWrite(Motor1_Dir_Pin1, HIGH);
         digitalWrite(Motor1_Dir_Pin2, LOW);
-        ledc_set_duty(LEDC_LOW_SPEED_MODE, MOTOR1_PWM_CHANNEL, speed);
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, MOTOR1_PWM_CHANNEL, rotationspeed);
         ledc_update_duty(LEDC_LOW_SPEED_MODE, MOTOR1_PWM_CHANNEL);
     }
-    else if (speed < 0)
+    else if (direction == Right)
     {
         digitalWrite(Motor1_Dir_Pin1, LOW);
         digitalWrite(Motor1_Dir_Pin2, HIGH);
-        ledc_set_duty(LEDC_LOW_SPEED_MODE, MOTOR1_PWM_CHANNEL, -speed);
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, MOTOR1_PWM_CHANNEL, -rotationspeed);
         ledc_update_duty(LEDC_LOW_SPEED_MODE, MOTOR1_PWM_CHANNEL);
     }
     else
@@ -67,45 +67,45 @@ void Motor2_Operate(int32_t speed)
 
 void Motor_Forward(uint16_t speed)
 {
-    Motor1_Operate(speed);
+    Motor1_Operate(None,0);
     Motor2_Operate(speed);
 }
 
 void Motor_Backward(uint16_t speed)
 {
-    Motor1_Operate(-speed);
+    Motor1_Operate(None,0);
     Motor2_Operate(-speed);
 }
-void Motor_RightForward(uint16_t speed)
+void Motor_RightForward(uint16_t speed,uint16_t rotationspeed)
 {
-    Motor1_Operate(speed);
+    Motor1_Operate(Right,speed);
     Motor2_Operate(0);
 }
-void Motor_LeftBackward(uint16_t speed)
+void Motor_LeftBackward(uint16_t speed,uint16_t rotationspeed)
 {
-    Motor1_Operate(-speed);
+    Motor1_Operate(Right,-speed);
     Motor2_Operate(-speed);
 }
 
-void Motor_LeftForward(uint16_t speed)
+void Motor_LeftForward(uint16_t speed,uint16_t rotationspeed)
 {
-    Motor1_Operate(0);
+    Motor1_Operate(Left,speed);
     Motor2_Operate(speed);
 }
 
-void Motor_RightBackward(uint16_t speed)
+void Motor_RightBackward(uint16_t speed,uint16_t rotationspeed)
 {
-    Motor1_Operate(0);
+    Motor1_Operate(None,0);
     Motor2_Operate(-speed);
 }
 
 void Motor_Stop(void)
 {
-    Motor1_Operate(0);
+    Motor1_Operate(None,0);
     Motor2_Operate(0);
         
 }
-void Vehicle_Move(enum VehicleMovement move, uint16_t speed)
+void Vehicle_Move(enum VehicleMovement move, uint16_t speed,uint16_t rotationspeed)
 {
     switch (move)
     {
@@ -116,16 +116,16 @@ void Vehicle_Move(enum VehicleMovement move, uint16_t speed)
         Motor_Backward(speed);
         break;
     case Vehicle_Right_Forward:
-        Motor_RightForward(speed);
+        Motor_RightForward(speed,rotationspeed);
         break;
     case Vehicle_Left_Backward:
-        Motor_LeftBackward(speed);
+        Motor_LeftBackward(speed,rotationspeed);
         break;
     case Vehicle_Left_Forward:
-        Motor_LeftForward(speed);
+        Motor_LeftForward(speed,rotationspeed);
         break;
     case Vehicle_Right_Backward:
-        Motor_RightBackward(speed);
+        Motor_RightBackward(speed,rotationspeed);
         break;
     default:
         Motor_Stop();
