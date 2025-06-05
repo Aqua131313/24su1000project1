@@ -1,5 +1,10 @@
 #include "motor.h"
 #include <Arduino.h>
+#include "timer.h"
+#include "operation.h"
+
+static uint8_t Motor1Count = 0;
+
 void Motor_Init(void)
 {
     Defined_PWM_Init();
@@ -37,6 +42,78 @@ void Motor1_Operate(VehicleDirection direction, int32_t rotationspeed)
         ledc_update_duty(LEDC_LOW_SPEED_MODE, MOTOR1_PWM_CHANNEL);
     }
 }
+
+void Motor1SetCount(void)
+{
+    if(MovementChangeFlag){
+        Motor1Count = 0;
+    }
+
+}
+
+void Motor_Tick(void)
+{   switch(movement)
+    {
+        case Vehicle_Forward:
+            Motor1_Operate(None, 0);
+            break;
+        case Vehicle_Backward:
+            Motor1_Operate(None, 0);
+        case Vehicle_Right_Forward:
+            Motor1SetCount();
+            Motor1Count++;
+            if (Motor1Count < Motor1DelayCount )
+            {
+                Motor1_Operate(Right, rotationspeed);
+            }
+            else
+            {
+                Motor1Count=0;
+                Motor1_Operate(None,0);
+            }
+            break;
+        case Vehicle_Left_Forward:
+            Motor1SetCount();
+            Motor1Count++;
+            if (Motor1Count< Motor1DelayCount)
+            {
+                Motor1_Operate(Left, rotationspeed);
+            }
+            else
+            {
+                Motor1Count=0;
+                Motor1_Operate(None,0);
+            }
+            break;
+        case Vehicle_Left_Backward:
+            Motor1SetCount();
+            Motor1Count++;
+            if (Motor1Count< Motor1DelayCount)
+            {
+                Motor1_Operate(Left, rotationspeed);
+            }
+            else
+            {
+                Motor1Count=0;
+                Motor1_Operate(None,0);
+            }
+            break;
+        case Vehicle_Right_Backward:
+            Motor1SetCount();
+            Motor1Count++;
+            if (Motor1Count< Motor1DelayCount)
+            {
+                Motor1_Operate(Right, rotationspeed);
+            }
+            else
+            {
+                Motor1Count=0;
+                Motor1_Operate(None,0);
+            }
+            break;
+       
+    }
+}
 void Motor2_Operate(int32_t speed)
 {
     if (speed < -MOTORARR)
@@ -67,41 +144,41 @@ void Motor2_Operate(int32_t speed)
 
 void Motor_Forward(uint16_t speed)
 {
-    Motor1_Operate(None,0);
+    
     Motor2_Operate(speed);
 }
 
 void Motor_Backward(uint16_t speed)
 {
-    Motor1_Operate(None,0);
+    
     Motor2_Operate(-speed);
 }
 void Motor_RightForward(uint16_t speed,uint16_t rotationspeed)
 {
-    Motor1_Operate(Right,speed);
+    
     Motor2_Operate(0);
 }
 void Motor_LeftBackward(uint16_t speed,uint16_t rotationspeed)
 {
-    Motor1_Operate(Right,-speed);
+    
     Motor2_Operate(-speed);
 }
 
 void Motor_LeftForward(uint16_t speed,uint16_t rotationspeed)
 {
-    Motor1_Operate(Left,speed);
+    
     Motor2_Operate(speed);
 }
 
 void Motor_RightBackward(uint16_t speed,uint16_t rotationspeed)
 {
-    Motor1_Operate(None,0);
+    
     Motor2_Operate(-speed);
 }
 
 void Motor_Stop(void)
 {
-    Motor1_Operate(None,0);
+    
     Motor2_Operate(0);
         
 }

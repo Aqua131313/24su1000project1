@@ -1,12 +1,33 @@
+#include "motor.h"
 #include "operation.h"
 #include "driver/ledc.h"
+#include "bleretro32.h"
+#include <cstdint>
+#include "timer.h"
 
-static enum VehicleMovement movement=Vehicle_Stop;
+enum VehicleMovement movement=Vehicle_Stop;
+enum VehicleMovement PreviousMovement=Vehicle_Stop;
+uint16_t MovementChangeFlag=0;
 static uint16_t vehiclespeed=0;
-static uint16_t rotationrotationspeed=0;
+uint16_t rotationspeed=0;
 void Operate_Init (void)
 {
     Motor_Init();
+    Defined_Timer_Init();
+}
+
+void ModeFlag(enum VehicleMovement newmode)
+{
+    PreviousMovement=movement;
+    movement=newmode;
+    if (movement != PreviousMovement)
+    {
+        MovementChangeFlag = 1;
+    }
+    else
+    {
+        MovementChangeFlag = 0;
+    }
 }
 
 void InterpretController(void){
@@ -18,31 +39,31 @@ void InterpretController(void){
 	//motor
     if(xboxjoyconLdata.r>JOYCON_DEADZONE){
         if(xboxjoyconLdata.angle>=-PI*5/8&&xboxjoyconLdata.angle<=-PI*3/8){
-            movement=Vehicle_Forward;
+            ModeFlag(Vehicle_Forward);
         }else if(xboxjoyconLdata.angle>=PI*3/8&&xboxjoyconLdata.angle<=PI*5/8){
-            movement=Vehicle_Backward;
+            ModeFlag(Vehicle_Backward);
         }else if(xboxjoyconLdata.angle>=-PI*5/8&&xboxjoyconLdata.angle<=-PI*3/8&&xboxdata.trg_r>TRG_DEADZONE){
-            movement=Vehicle_Right_Forward;
-            rotationrotationspeed=TrgToMotorSpeed(xboxdata.trg_r);
+            ModeFlag(Vehicle_Right_Forward);
+            rotationspeed=TrgToMotorSpeed(xboxdata.trg_r);
         }else if(xboxjoyconLdata.angle>=-PI*5/8&&xboxjoyconLdata.angle<=-PI*3/8&&xboxdata.trg_l>TRG_DEADZONE){
-            movement=Vehicle_Left_Forward;
-            rotationrotationspeed=TrgToMotorSpeed(xboxdata.trg_l);
+            ModeFlag(Vehicle_Left_Forward);
+            rotationspeed=TrgToMotorSpeed(xboxdata.trg_l);
         }else if(xboxjoyconLdata.angle>=PI*3/8&&xboxjoyconLdata.angle<=PI*5/8&&xboxdata.trg_r>TRG_DEADZONE){
-            movement=Vehicle_Right_Backward;
-            rotationrotationspeed=TrgToMotorSpeed(xboxdata.trg_r);
+            ModeFlag(Vehicle_Right_Backward);
+            rotationspeed=TrgToMotorSpeed(xboxdata.trg_r);
         }else if(xboxjoyconLdata.angle>=PI*3/8&&xboxjoyconLdata.angle<=PI*5/8&&xboxdata.trg_l>TRG_DEADZONE){
-            movement=Vehicle_Left_Backward;
-            rotationrotationspeed=TrgToMotorSpeed(xboxdata.trg_l);
+            ModeFlag(Vehicle_Left_Backward);
+            rotationspeed=TrgToMotorSpeed(xboxdata.trg_l);
         }
         vehiclespeed=RadiusToMotorSpeed(xboxjoyconLdata.r);
         
     }else{
-        movement=Vehicle_Stop;
+        ModeFlag(Vehicle_Stop);
         vehiclespeed=0;
     }
 		
 }
 void Operate(void){
     //include servomode steppermode and vehiclemove
-		Vehicle_Move(movement,vehiclespeed,rotationrotationspeed);
+		Vehicle_Move(movement,vehiclespeed,rotationspeed);
 }

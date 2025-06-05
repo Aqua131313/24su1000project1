@@ -6,7 +6,9 @@
 #include "bleretro32.h"
 #include "xbox.h"
 #include "operation.h"
-#include "PWM.h"
+#include "pwm.h"
+#include "motor.h"
+#include "timer.h"
 
 
 pad_definition_t pad_list[] = {
